@@ -50,8 +50,6 @@ def clear_history_position(app):
 
 
 def select_previous(app):
-    print(app.history)
-    print()
     if len(app.history) == 0:
         return
     app.history_position = (app.history_position + 1) % len(app.history)
@@ -71,9 +69,10 @@ def select_next(app):
 
 
 def evaluate(app):
+    formula = app.formula.value
     try:
-        result = eval(parser.expr(app.formula.value).compile())
-        app.result.set('<i>' + app.formula.value + '</i> = ' + str(result))
+        result = eval(parser.expr(formula).compile())
+        app.result.set('<i>' + formula + '</i> = ' + str(result))
         clear(app)
     except TypeError as e:
         app.result.set(str(e))
@@ -81,7 +80,7 @@ def evaluate(app):
         app.result.set("Invalid syntax")
 
     # Add evaluated formula to history
-    app.history.append(app.formula.value)
+    app.history.append(formula)
     if len(app.history) > app.max_history_length:
         app.history = app.history[1:]
 
@@ -101,9 +100,6 @@ def setup_buttons(grid, app):
     bracket_open_btn = QPushButton("(")
     grid.addWidget(bracket_open_btn, 0, 0, 1, 1)
     bracket_open_btn.clicked.connect(lambda: append(app, "("))
-
-    pushButton_44 = QPushButton("EE")
-    grid.addWidget(pushButton_44, 3, 5, 1, 1)
 
     # Setup constants
     e_button = QPushButton("e")
@@ -131,17 +127,21 @@ def setup_buttons(grid, app):
     grid.addWidget(push_button_14, 1, 5, 1, 1)
     push_button_14.clicked.connect(lambda: append(app, "10**"))
 
-    pushButton_18 = QPushButton("x^2")
-    grid.addWidget(pushButton_18, 1, 1, 1, 1)
-    pushButton_18.clicked.connect(lambda: append(app, "**2"))
+    pow2_button = QPushButton("x^2")
+    grid.addWidget(pow2_button, 1, 1, 1, 1)
+    pow2_button.clicked.connect(lambda: append(app, "**2"))
 
-    pushButton_17 = QPushButton("x^3")
-    grid.addWidget(pushButton_17, 1, 2, 1, 1)
-    pushButton_17.clicked.connect(lambda: append(app, "**3"))
+    pow3_button = QPushButton("x^3")
+    grid.addWidget(pow3_button, 1, 2, 1, 1)
+    pow3_button.clicked.connect(lambda: append(app, "**3"))
 
     power_btn = QPushButton("x^y")
     grid.addWidget(power_btn, 1, 3, 1, 1)
     power_btn.clicked.connect(lambda: append(app, "**"))
+
+    ee_button = QPushButton("EE")
+    grid.addWidget(ee_button, 3, 5, 1, 1)
+    ee_button.clicked.connect(lambda: append(app, "*10**"))
 
     # Setup memory functionality
     mem_clear_btn = QPushButton("mc")
