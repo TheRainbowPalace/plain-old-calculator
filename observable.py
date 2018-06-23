@@ -1,5 +1,5 @@
 """
-Author: Jakob Rieke
+© 2018 Jakob Rieke
 """
 
 

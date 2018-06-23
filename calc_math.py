@@ -1,3 +1,7 @@
+"""
+© 2018 Jakob Rieke
+"""
+
 from math import *
 import math
 from random import random as rand

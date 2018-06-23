@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Author: Jakob Rieke
+© 2018 Jakob Rieke
 """
 
 
@@ -9,15 +9,16 @@ import sys
 import parser
 from calc_math import *
 from observable import Observable
-from PyQt5 import QtCore
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, \
-    QLayout, QLabel, QVBoxLayout, QTextEdit
+    QLayout, QLabel, QVBoxLayout
 
 
 class App:
     def __init__(self):
         self.title = Observable("Calculator")
+        self.window_position = (0, 0)
         self.empty_formula = '0'
         self.formula = Observable(self.empty_formula)
         self.result = Observable("")
@@ -43,10 +44,6 @@ def clear_history(app):
     app.history.clear()
     app.history_position = -1
     app.result.set('')
-
-
-def clear_history_position(app):
-    pass
 
 
 def select_previous(app):
@@ -86,8 +83,10 @@ def evaluate(app):
 
 
 def setup_buttons(grid, app):
+    # Setup extended control buttons
     toggle_mode_btn = QPushButton("2^nd")
     grid.addWidget(toggle_mode_btn, 1, 0, 1, 1)
+    toggle_mode_btn.clicked.connect(lambda: print("Unassigned"))
 
     rand_btn = QPushButton("Rand")
     grid.addWidget(rand_btn, 4, 5, 1, 1)
@@ -100,6 +99,23 @@ def setup_buttons(grid, app):
     bracket_open_btn = QPushButton("(")
     grid.addWidget(bracket_open_btn, 0, 0, 1, 1)
     bracket_open_btn.clicked.connect(lambda: append(app, "("))
+
+    # Setup memory functionality
+    mem_clear_btn = QPushButton("mc")
+    grid.addWidget(mem_clear_btn, 0, 2, 1, 1)
+    mem_clear_btn.clicked.connect(lambda: clear_history(app))
+
+    previous_btn = QPushButton("pre")
+    grid.addWidget(previous_btn, 0, 3, 1, 1)
+    previous_btn.clicked.connect(lambda: select_previous(app))
+
+    next_btn = QPushButton("next")
+    grid.addWidget(next_btn, 0, 4, 1, 1)
+    next_btn.clicked.connect(lambda: select_next(app))
+
+    mem_remove_btn = QPushButton("mr")
+    grid.addWidget(mem_remove_btn, 0, 5, 1, 1)
+    mem_remove_btn.clicked.connect(lambda: print("Unassigned"))
 
     # Setup constants
     e_button = QPushButton("e")
@@ -142,23 +158,6 @@ def setup_buttons(grid, app):
     ee_button = QPushButton("EE")
     grid.addWidget(ee_button, 3, 5, 1, 1)
     ee_button.clicked.connect(lambda: append(app, "*10**"))
-
-    # Setup memory functionality
-    mem_clear_btn = QPushButton("mc")
-    grid.addWidget(mem_clear_btn, 0, 2, 1, 1)
-    mem_clear_btn.clicked.connect(lambda: clear_history(app))
-
-    previous_btn = QPushButton("pre")
-    grid.addWidget(previous_btn, 0, 3, 1, 1)
-    previous_btn.clicked.connect(lambda: select_previous(app))
-
-    next_btn = QPushButton("next")
-    grid.addWidget(next_btn, 0, 4, 1, 1)
-    next_btn.clicked.connect(lambda: select_next(app))
-
-    mem_remove_btn = QPushButton("mr")
-    grid.addWidget(mem_remove_btn, 0, 5, 1, 1)
-    mem_remove_btn.clicked.connect(lambda: clear_history_position(app))
 
     # Setup trigonometric functions
     cos_btn = QPushButton("cos")
@@ -355,10 +354,10 @@ def main():
     """)
 
     app_icon = QIcon()
-    app_icon.addFile('resources/icon-16x.png', QtCore.QSize(16, 16))
-    app_icon.addFile('resources/icon-64x.png', QtCore.QSize(64, 64))
-    app_icon.addFile('resources/icon-128x.png', QtCore.QSize(128, 128))
-    app_icon.addFile('resources/icon-256x.png', QtCore.QSize(256, 256))
+    app_icon.addFile('resources/icon-16x.png', QSize(16, 16))
+    app_icon.addFile('resources/icon-64x.png', QSize(64, 64))
+    app_icon.addFile('resources/icon-128x.png', QSize(128, 128))
+    app_icon.addFile('resources/icon-256x.png', QSize(256, 256))
     qt_app.setWindowIcon(app_icon)
 
     app = App()
@@ -372,15 +371,9 @@ def main():
     app.result.listen(lambda o, n: result.setText(n))
     result.setObjectName("result")
 
-    text_edit = QTextEdit()
-    text_edit.setAlignment(QtCore.Qt.AlignRight)
-    text_edit.setLineWrapMode(False)
-    text_edit.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-
     output_layout = QVBoxLayout()
-    output_layout.addWidget(result, 0, QtCore.Qt.AlignRight)
-    output_layout.addWidget(formula, 0, QtCore.Qt.AlignRight)
-    # output_layout.addWidget(text_edit, 0, QtCore.Qt.AlignRight)
+    output_layout.addWidget(result, 0, Qt.AlignRight)
+    output_layout.addWidget(formula, 0, Qt.AlignRight)
     output_layout.setContentsMargins(10, 5, 10, 5)
 
     output = QWidget()
@@ -405,7 +398,6 @@ def main():
     window = QWidget()
     window.setObjectName("window")
     window.setLayout(root)
-    # window.setWindowFlag(QtCore.Qt.FramelessWindowHint)
     window.setWindowTitle(app.title.value)
     app.title.listen(lambda o, n: window.setWindowTitle(n))
     window.show()
