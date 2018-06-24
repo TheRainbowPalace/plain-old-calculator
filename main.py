@@ -40,6 +40,10 @@ def clear(app):
     app.formula.set(app.empty_formula)
 
 
+def clear_last(app):
+    app.formula.set(app.formula.value[:-1])
+
+
 def clear_history(app):
     app.history.clear()
     app.history_position = -1
@@ -82,41 +86,7 @@ def evaluate(app):
         app.history = app.history[1:]
 
 
-def setup_buttons(grid, app):
-    # Setup extended control buttons
-    toggle_mode_btn = QPushButton("2^nd")
-    grid.addWidget(toggle_mode_btn, 1, 0, 1, 1)
-    toggle_mode_btn.clicked.connect(lambda: print("Unassigned"))
-
-    rand_btn = QPushButton("Rand")
-    grid.addWidget(rand_btn, 4, 5, 1, 1)
-    rand_btn.clicked.connect(lambda: append(app, "rand()"))
-
-    bracket_close_btn = QPushButton(")")
-    grid.addWidget(bracket_close_btn, 0, 1, 1, 1)
-    bracket_close_btn.clicked.connect(lambda: append(app, ")"))
-
-    bracket_open_btn = QPushButton("(")
-    grid.addWidget(bracket_open_btn, 0, 0, 1, 1)
-    bracket_open_btn.clicked.connect(lambda: append(app, "("))
-
-    # Setup memory functionality
-    mem_clear_btn = QPushButton("mc")
-    grid.addWidget(mem_clear_btn, 0, 2, 1, 1)
-    mem_clear_btn.clicked.connect(lambda: clear_history(app))
-
-    previous_btn = QPushButton("pre")
-    grid.addWidget(previous_btn, 0, 3, 1, 1)
-    previous_btn.clicked.connect(lambda: select_previous(app))
-
-    next_btn = QPushButton("next")
-    grid.addWidget(next_btn, 0, 4, 1, 1)
-    next_btn.clicked.connect(lambda: select_next(app))
-
-    mem_remove_btn = QPushButton("mr")
-    grid.addWidget(mem_remove_btn, 0, 5, 1, 1)
-    mem_remove_btn.clicked.connect(lambda: print("Unassigned"))
-
+def setup_extended_operator_buttons(grid, app):
     # Setup constants
     e_button = QPushButton("e")
     grid.addWidget(e_button, 3, 4, 1, 1)
@@ -211,84 +181,138 @@ def setup_buttons(grid, app):
     sqrt3_btn.clicked.connect(lambda: append(app, "sqrt3("))
 
 
+def setup_extended_control_buttons(grid, app):
+    toggle_mode_btn = QPushButton("2^nd")
+    grid.addWidget(toggle_mode_btn, 1, 0, 1, 1)
+    toggle_mode_btn.clicked.connect(lambda: print("Unassigned"))
+
+    rand_btn = QPushButton("Rand")
+    grid.addWidget(rand_btn, 4, 5, 1, 1)
+    rand_btn.clicked.connect(lambda: append(app, "rand()"))
+
+    bracket_open_btn = QPushButton("(")
+    grid.addWidget(bracket_open_btn, 0, 0, 1, 1)
+    bracket_open_btn.clicked.connect(lambda: append(app, "("))
+    bracket_open_btn.setShortcut('(')
+
+    bracket_close_btn = QPushButton(")")
+    grid.addWidget(bracket_close_btn, 0, 1, 1, 1)
+    bracket_close_btn.clicked.connect(lambda: append(app, ")"))
+    bracket_close_btn.setShortcut(')')
+
+    # Setup memory functionality
+    mem_clear_btn = QPushButton("mc")
+    grid.addWidget(mem_clear_btn, 0, 2, 1, 1)
+    mem_clear_btn.clicked.connect(lambda: clear_history(app))
+
+    previous_btn = QPushButton("pre")
+    grid.addWidget(previous_btn, 0, 3, 1, 1)
+    previous_btn.clicked.connect(lambda: select_previous(app))
+
+    next_btn = QPushButton("next")
+    grid.addWidget(next_btn, 0, 4, 1, 1)
+    next_btn.clicked.connect(lambda: select_next(app))
+
+    mem_remove_btn = QPushButton("mr")
+    grid.addWidget(mem_remove_btn, 0, 5, 1, 1)
+    mem_remove_btn.clicked.connect(lambda: print("Unassigned"))
+
+
 def setup_number_buttons(grid, app):
     number0_btn = QPushButton("0")
     grid.addWidget(number0_btn, 4, 6, 1, 2)
     number0_btn.clicked.connect(lambda: append(app, "0"))
+    number0_btn.setShortcut('0')
 
     number1_btn = QPushButton("1")
     grid.addWidget(number1_btn, 3, 6, 1, 1)
     number1_btn.clicked.connect(lambda: append(app, "1"))
+    number1_btn.setShortcut('1')
 
     number2_btn = QPushButton("2")
     grid.addWidget(number2_btn, 3, 7, 1, 1)
     number2_btn.clicked.connect(lambda: append(app, "2"))
+    number2_btn.setShortcut('2')
 
     number3_btn = QPushButton("3")
     grid.addWidget(number3_btn, 3, 8, 1, 1)
     number3_btn.clicked.connect(lambda: append(app, "3"))
+    number3_btn.setShortcut('3')
 
     number4_btn = QPushButton("4")
     grid.addWidget(number4_btn, 2, 6, 1, 1)
     number4_btn.clicked.connect(lambda: append(app, "4"))
+    number4_btn.setShortcut('4')
 
     number5_btn = QPushButton("5")
     grid.addWidget(number5_btn, 2, 7, 1, 1)
     number5_btn.clicked.connect(lambda: append(app, "5"))
+    number5_btn.setShortcut('5')
 
     number6_btn = QPushButton("6")
     grid.addWidget(number6_btn, 2, 8, 1, 1)
     number6_btn.clicked.connect(lambda: append(app, "6"))
+    number6_btn.setShortcut('6')
 
     number7_btn = QPushButton("7")
     grid.addWidget(number7_btn, 1, 6, 1, 1)
     number7_btn.clicked.connect(lambda: append(app, "7"))
+    number7_btn.setShortcut('7')
 
     number8_btn = QPushButton("8")
     grid.addWidget(number8_btn, 1, 7, 1, 1)
     number8_btn.clicked.connect(lambda: append(app, "8"))
+    number8_btn.setShortcut('8')
 
     number9_btn = QPushButton("9")
     grid.addWidget(number9_btn, 1, 8, 1, 1)
     number9_btn.clicked.connect(lambda: append(app, "9"))
+    number9_btn.setShortcut('9')
 
 
 def setup_basic_buttons(grid, app):
     ac_btn = QPushButton("AC")
     grid.addWidget(ac_btn, 0, 6, 1, 1)
     ac_btn.clicked.connect(lambda: clear(app))
+    ac_btn.setShortcut('Shift+c')
 
-    sign_btn = QPushButton("Br")
-    grid.addWidget(sign_btn, 0, 7, 1, 1)
-    sign_btn.clicked.connect(lambda: app.formula.set(app.formula.value[:-1]))
+    back_btn = QPushButton("Br")
+    grid.addWidget(back_btn, 0, 7, 1, 1)
+    back_btn.clicked.connect(lambda: clear_last(app))
 
-    percent_btn = QPushButton("mod")
-    grid.addWidget(percent_btn, 0, 8, 1, 1)
-    percent_btn.clicked.connect(lambda: append(app, "%"))
+    mod_btn = QPushButton("mod")
+    grid.addWidget(mod_btn, 0, 8, 1, 1)
+    mod_btn.clicked.connect(lambda: append(app, "%"))
 
     divide_btn = QPushButton("/")
     grid.addWidget(divide_btn, 0, 9, 1, 1)
     divide_btn.clicked.connect(lambda: append(app, "/"))
+    divide_btn.setShortcut('/')
 
     multiply_btn = QPushButton("*")
     grid.addWidget(multiply_btn, 1, 9, 1, 1)
     multiply_btn.clicked.connect(lambda: append(app, "*"))
+    multiply_btn.setShortcut('*')
 
     plus_btn = QPushButton("+")
     grid.addWidget(plus_btn, 2, 9, 1, 1)
     plus_btn.clicked.connect(lambda: append(app, "+"))
+    plus_btn.setShortcut('+')
 
     minus_btn = QPushButton("-")
     grid.addWidget(minus_btn, 3, 9, 1, 1)
     minus_btn.clicked.connect(lambda: append(app, "-"))
+    minus_btn.setShortcut('-')
 
     comma_btn = QPushButton(".")
     grid.addWidget(comma_btn, 4, 8, 1, 1)
     comma_btn.clicked.connect(lambda: append(app, "."))
+    comma_btn.setShortcut('.')
 
     eval_btn = QPushButton("=")
     grid.addWidget(eval_btn, 4, 9, 1, 1)
     eval_btn.clicked.connect(lambda: evaluate(app))
+    eval_btn.setShortcut('Return')
 
 
 def main():
@@ -385,9 +409,10 @@ def main():
     controls.setContentsMargins(0, 0, 0, 0)
     controls.setSpacing(1)
 
-    setup_buttons(controls, app)
     setup_number_buttons(controls, app)
     setup_basic_buttons(controls, app)
+    setup_extended_operator_buttons(controls, app)
+    setup_extended_control_buttons(controls, app)
 
     root = QVBoxLayout()
     root.setContentsMargins(0, 0, 0, 0)
@@ -395,8 +420,16 @@ def main():
     root.addWidget(output)
     root.addLayout(controls)
 
+    def onKeyPressed(event):
+        key = event.key()
+        if key == Qt.Key_Backspace:
+            clear_last(app)
+        elif 65 <= key <= 90:
+            append(app, chr(key).lower())
+
     window = QWidget()
     window.setObjectName("window")
+    window.keyPressEvent = lambda event: onKeyPressed(event)
     window.setLayout(root)
     window.setWindowTitle(app.title.value)
     app.title.listen(lambda o, n: window.setWindowTitle(n))
