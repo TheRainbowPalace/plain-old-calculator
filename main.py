@@ -42,6 +42,8 @@ def clear(app):
 
 def clear_last(app):
     app.formula.set(app.formula.value[:-1])
+    if app.formula.value == '':
+        app.formula.set(app.empty_formula)
 
 
 def clear_history(app):
