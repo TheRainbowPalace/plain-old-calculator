@@ -1,6 +1,6 @@
 # Plain old calculator
 
-![alt text](https://github.com/therainbowpalace/plain-old-calculator/docs/app-snapshot-01.jpg)
+![alt text](https://github.com/TheRainbowPalace/plain-old-calculator/blob/master/docs/app-snapshot-01.jpg)
 
 
 ### Introduction
@@ -21,8 +21,10 @@ and finally start the app
 
 
 ### Side Notes
-The project was only tested under Mac Os but should also run under Linux and
+- The project was only tested under Mac Os but should also run under Linux and
 Windows.
+- The mr and 2^nd button don't have any functionality yet maybe some is added
+in time
 
 
 ### License
