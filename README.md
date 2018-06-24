@@ -1,6 +1,6 @@
 # Plain old calculator
 
-![alt text](https://github.com/therainbowpalace/plain-old-calculator/docs/app-snapshot-01.jpg)
+![alt text](https://github.com/TheRainbowPalace/plain-old-calculator/blob/master/docs/app-snapshot-01.jpg)
 
 
 ### Introduction
