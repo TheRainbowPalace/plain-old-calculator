@@ -23,8 +23,13 @@ and finally start the app
 ### Side Notes
 - The project was only tested under Mac Os but should also run under Linux and
 Windows.
+- The function is parsed by python directly so you can use any basic python
+function if you want but remember it has to fit in one line ;)
 - The mr and 2^nd button don't have any functionality yet maybe some is added
 in time
+- If you are using the i3 window manager (e.g. if you are using Arch) you might
+want to display the app as a floating window, since it is meant to keep it's
+fixed size
 
 
 ### License
