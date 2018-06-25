@@ -12,7 +12,7 @@ from observable import Observable
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, \
-    QLayout, QLabel, QVBoxLayout
+    QLayout, QLabel, QVBoxLayout, QTextEdit, QMenuBar, QMenu, QAction
 
 
 class App:
@@ -56,7 +56,6 @@ def select_previous(app):
     if len(app.history) == 0:
         return
     app.history_position = (app.history_position + 1) % len(app.history)
-    print(app.history_position)
     app.formula.set(app.history[app.history_position])
 
 
@@ -210,10 +209,12 @@ def setup_extended_control_buttons(grid, app):
     previous_btn = QPushButton("pre")
     grid.addWidget(previous_btn, 0, 3, 1, 1)
     previous_btn.clicked.connect(lambda: select_previous(app))
+    previous_btn.setShortcut('Down')
 
     next_btn = QPushButton("next")
     grid.addWidget(next_btn, 0, 4, 1, 1)
     next_btn.clicked.connect(lambda: select_next(app))
+    next_btn.setShortcut('Up')
 
     mem_remove_btn = QPushButton("mr")
     grid.addWidget(mem_remove_btn, 0, 5, 1, 1)
@@ -317,6 +318,52 @@ def setup_basic_buttons(grid, app):
     eval_btn.setShortcut('Return')
 
 
+def setup_result(app):
+    text_edit = QTextEdit()
+    text_edit.setObjectName("result")
+
+    text_edit.setAlignment(Qt.AlignRight)
+    text_edit.setLineWrapMode(False)
+    text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    text_edit.document().setDocumentMargin(0)
+    text_edit.setTextInteractionFlags(Qt.TextSelectableByMouse)
+
+    horizontal_scrollbar = text_edit.horizontalScrollBar()
+
+    def set_text(text):
+        text_edit.setText(text)
+        text_edit.setAlignment(Qt.AlignRight)
+        horizontal_scrollbar.setValue(horizontal_scrollbar.maximum())
+
+    app.result.listen(lambda o, n: set_text(n))
+
+    return text_edit
+
+
+def setup_formula(app):
+    text_edit = QTextEdit(app.empty_formula)
+    text_edit.setObjectName("formula")
+
+    text_edit.setAlignment(Qt.AlignRight)
+    text_edit.setLineWrapMode(False)
+    text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    text_edit.document().setDocumentMargin(0)
+    text_edit.setTextInteractionFlags(Qt.TextSelectableByMouse)
+
+    horizontal_scrollbar = text_edit.horizontalScrollBar()
+
+    def set_text(text):
+        text_edit.setText(text)
+        text_edit.setAlignment(Qt.AlignRight)
+        horizontal_scrollbar.setValue(0)
+
+    app.formula.listen(lambda o, n: set_text(n))
+
+    return text_edit
+
+
 def main():
     qt_app = QApplication(sys.argv)
     qt_app.setStyleSheet("""
@@ -357,25 +404,20 @@ def main():
         QWidget#output {
             background-color: #282828;
         }
-        QLabel#output, QLabel#result {
+        QTextEdit#formula, QTextEdit#result {
+            background-color: transparent;
             color: white;
             font-weight: light;
-        }
-        QLabel#output {
-            font-size: 30px;
-        }
-        QLabel#result {
-            font-size: 12px;
-        }
-        
-        QTextEdit {
-            background-color: transparent;
-            max-height: 45px;
-            font-size: 30px;
             min-width: 560px;
             max-width: 560px;
-            text-align: right;
-            color: white;
+        }
+        QTextEdit#formula {
+            max-height: 45px;
+            font-size: 30px;
+        }
+        QTextEdit#result {
+            max-height: 27px;
+            font-size: 12px;
         }
     """)
 
@@ -388,14 +430,8 @@ def main():
 
     app = App()
 
-    formula = QLabel("0")
-    formula.setWordWrap(True)
-    app.formula.listen(lambda o, n: formula.setText(n))
-    formula.setObjectName("output")
-
-    result = QLabel(app.result.value)
-    app.result.listen(lambda o, n: result.setText(n))
-    result.setObjectName("result")
+    result = setup_result(app)
+    formula = setup_formula(app)
 
     output_layout = QVBoxLayout()
     output_layout.addWidget(result, 0, Qt.AlignRight)
