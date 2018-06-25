@@ -6,13 +6,14 @@
 
 
 import sys
+from time import time
 import parser
 from calc_math import *
 from observable import Observable
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, \
-    QLayout, QLabel, QVBoxLayout, QTextEdit, QMenuBar, QMenu, QAction
+    QLayout, QVBoxLayout, QTextEdit, QMenuBar, QMenu, QAction, QMainWindow
 
 
 class App:
@@ -80,6 +81,9 @@ def evaluate(app):
         app.result.set(str(e))
     except SyntaxError:
         app.result.set("Invalid syntax")
+    except NameError as e:
+        error_string = str(e)
+        app.result.set(error_string[0].upper() + error_string[1:])
 
     # Add evaluated formula to history
     app.history.append(formula)
@@ -318,6 +322,20 @@ def setup_basic_buttons(grid, app):
     eval_btn.setShortcut('Return')
 
 
+def setup_controls(app):
+    controls = QGridLayout()
+    controls.setSizeConstraint(QLayout.SetNoConstraint)
+    controls.setContentsMargins(0, 0, 0, 0)
+    controls.setSpacing(1)
+
+    setup_number_buttons(controls, app)
+    setup_basic_buttons(controls, app)
+    setup_extended_operator_buttons(controls, app)
+    setup_extended_control_buttons(controls, app)
+
+    return controls
+
+
 def setup_result(app):
     text_edit = QTextEdit()
     text_edit.setObjectName("result")
@@ -329,12 +347,12 @@ def setup_result(app):
     text_edit.document().setDocumentMargin(0)
     text_edit.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
-    horizontal_scrollbar = text_edit.horizontalScrollBar()
+    h_scrollbar = text_edit.horizontalScrollBar()
 
     def set_text(text):
         text_edit.setText(text)
         text_edit.setAlignment(Qt.AlignRight)
-        horizontal_scrollbar.setValue(horizontal_scrollbar.maximum())
+        h_scrollbar.setValue(0)
 
     app.result.listen(lambda o, n: set_text(n))
 
@@ -352,22 +370,68 @@ def setup_formula(app):
     text_edit.document().setDocumentMargin(0)
     text_edit.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
-    horizontal_scrollbar = text_edit.horizontalScrollBar()
+    h_scrollbar = text_edit.horizontalScrollBar()
 
     def set_text(text):
         text_edit.setText(text)
         text_edit.setAlignment(Qt.AlignRight)
-        horizontal_scrollbar.setValue(0)
+        h_scrollbar.setValue(h_scrollbar.maximum())
 
     app.formula.listen(lambda o, n: set_text(n))
 
     return text_edit
 
 
+def setup_output(app):
+    result = setup_result(app)
+    formula = setup_formula(app)
+
+    output_layout = QVBoxLayout()
+    output_layout.addWidget(result, 0, Qt.AlignRight)
+    output_layout.addWidget(formula, 0, Qt.AlignRight)
+    output_layout.setContentsMargins(10, 5, 10, 5)
+
+    output = QWidget()
+    output.setObjectName('output')
+    output.setLayout(output_layout)
+
+    return output
+
+
+def setup_menu_bar(app):
+    # Add View Menu
+    toggle_controls = QAction()
+    toggle_controls.setText("Hide Controls")
+
+    view_menu = QMenu()
+    view_menu.setTitle("&View")
+    view_menu.addAction(toggle_controls)
+
+    # Create Library Menu
+    add_library = QAction()
+    add_library.setText("Add Library")
+
+    library_menu = QMenu()
+    library_menu.setTitle("&Library")
+    library_menu.addAction(add_library)
+
+    test_action = QAction()
+    test_action.setText('_Heeellooo')
+
+    menu_bar = QMenuBar()
+    menu_bar.addAction(test_action)
+    menu_bar.addMenu(view_menu)
+    menu_bar.addMenu(library_menu)
+
+    return menu_bar
+
+
 def main():
+    start_time = time()
+
     qt_app = QApplication(sys.argv)
     qt_app.setStyleSheet("""
-        QWidget#window {
+        QWidget#root {
             background-color: #8E8E8E;
         }
         
@@ -430,33 +494,14 @@ def main():
 
     app = App()
 
-    result = setup_result(app)
-    formula = setup_formula(app)
+    output = setup_output(app)
+    controls = setup_controls(app)
 
-    output_layout = QVBoxLayout()
-    output_layout.addWidget(result, 0, Qt.AlignRight)
-    output_layout.addWidget(formula, 0, Qt.AlignRight)
-    output_layout.setContentsMargins(10, 5, 10, 5)
-
-    output = QWidget()
-    output.setObjectName('output')
-    output.setLayout(output_layout)
-
-    controls = QGridLayout()
-    controls.setSizeConstraint(QLayout.SetNoConstraint)
-    controls.setContentsMargins(0, 0, 0, 0)
-    controls.setSpacing(1)
-
-    setup_number_buttons(controls, app)
-    setup_basic_buttons(controls, app)
-    setup_extended_operator_buttons(controls, app)
-    setup_extended_control_buttons(controls, app)
-
-    root = QVBoxLayout()
-    root.setContentsMargins(0, 0, 0, 0)
-    root.setSpacing(0)
-    root.addWidget(output)
-    root.addLayout(controls)
+    root_layout = QVBoxLayout()
+    root_layout.setContentsMargins(0, 0, 0, 0)
+    root_layout.setSpacing(0)
+    root_layout.addWidget(output)
+    root_layout.addLayout(controls)
 
     def onKeyPressed(event):
         key = event.key()
@@ -465,16 +510,25 @@ def main():
         elif 65 <= key <= 90:
             append(app, chr(key).lower())
 
-    window = QWidget()
-    window.setObjectName("window")
-    window.keyPressEvent = lambda event: onKeyPressed(event)
-    window.setLayout(root)
-    window.setWindowTitle(app.title.value)
-    app.title.listen(lambda o, n: window.setWindowTitle(n))
+    root = QWidget()
+    root.setObjectName("root")
+    root.keyPressEvent = lambda event: onKeyPressed(event)
+    root.setLayout(root_layout)
+    root.setWindowTitle(app.title.value)
+    app.title.listen(lambda o, n: root.setWindowTitle(n))
+
+    menu_bar = setup_menu_bar(app)
+
+    window = QMainWindow()
+    window.setWindowTitle("Plain Old Calculator")
+    window.setCentralWidget(root)
+    window.setMenuBar(menu_bar)
     window.show()
-    window.setFixedSize(window.width(), window.height())
+    window.setFixedSize(root.width(), root.height())
 
-    sys.exit(qt_app.exec())
+    print('Start time:', str(round(time() - start_time, 3)) + 's')
+    qt_app.exec()
 
 
-main()
+if __name__ == '__main__':
+    sys.exit(main())
