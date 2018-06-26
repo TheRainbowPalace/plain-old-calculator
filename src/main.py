@@ -6,7 +6,6 @@
 Main entry point for 'Plain Old Calculator' (Poc) application
 
 Todo:
-* Add persistent preference managing
 * Add tooltips to controls
 * Create a better application icon
 * Create scripts to build Mac Os, Windows and Linux Executables

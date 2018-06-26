@@ -2,9 +2,6 @@
 © 2018 Jakob Rieke
 
 Core Library for mathematical expression parsing in Poc
-
-Todo:
-* Use sth different then eval(...) to evaluate expressions (maybe SymPy)
 """
 
 from math import *
