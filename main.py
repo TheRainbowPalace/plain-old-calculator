@@ -187,9 +187,10 @@ def setup_extended_operator_buttons(grid, app):
 
 
 def setup_extended_control_buttons(grid, app):
-    toggle_mode_btn = QPushButton("2^nd")
-    grid.addWidget(toggle_mode_btn, 1, 0, 1, 1)
-    toggle_mode_btn.clicked.connect(lambda: print("Unassigned"))
+    comma_btn = QPushButton(",")
+    grid.addWidget(comma_btn, 1, 0, 1, 1)
+    comma_btn.clicked.connect(lambda: append(app, ','))
+    comma_btn.setShortcut(',')
 
     rand_btn = QPushButton("Rand")
     grid.addWidget(rand_btn, 4, 5, 1, 1)
@@ -480,7 +481,7 @@ def main():
             font-size: 30px;
         }
         QTextEdit#result {
-            max-height: 27px;
+            max-height: 20px;
             font-size: 12px;
         }
     """)
