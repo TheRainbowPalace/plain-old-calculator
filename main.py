@@ -7,8 +7,7 @@
 
 import sys
 from time import time
-import parser
-from calc_math import *
+import math_core
 from observable import Observable
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
@@ -26,6 +25,8 @@ class App:
         self.history = []
         self.history_position = -1
         self.max_history_length = 100
+
+        self.show_controls = Observable(True)
 
 
 def append(app, value):
@@ -74,7 +75,7 @@ def select_next(app):
 def evaluate(app):
     formula = app.formula.value
     try:
-        result = eval(parser.expr(formula).compile())
+        result = math_core.evaluate(formula)
         app.result.set('<i>' + formula + '</i> = ' + str(result))
         clear(app)
     except TypeError as e:
@@ -291,6 +292,7 @@ def setup_basic_buttons(grid, app):
     mod_btn = QPushButton("mod")
     grid.addWidget(mod_btn, 0, 8, 1, 1)
     mod_btn.clicked.connect(lambda: append(app, "%"))
+    mod_btn.setShortcut('%')
 
     divide_btn = QPushButton("/")
     grid.addWidget(divide_btn, 0, 9, 1, 1)
@@ -324,15 +326,25 @@ def setup_basic_buttons(grid, app):
 
 
 def setup_controls(app):
-    controls = QGridLayout()
-    controls.setSizeConstraint(QLayout.SetNoConstraint)
-    controls.setContentsMargins(0, 0, 0, 0)
-    controls.setSpacing(1)
+    controls_layout = QGridLayout()
+    controls_layout.setSizeConstraint(QLayout.SetNoConstraint)
+    controls_layout.setContentsMargins(0, 0, 0, 0)
+    controls_layout.setSpacing(1)
 
-    setup_number_buttons(controls, app)
-    setup_basic_buttons(controls, app)
-    setup_extended_operator_buttons(controls, app)
-    setup_extended_control_buttons(controls, app)
+    setup_number_buttons(controls_layout, app)
+    setup_basic_buttons(controls_layout, app)
+    setup_extended_operator_buttons(controls_layout, app)
+    setup_extended_control_buttons(controls_layout, app)
+
+    controls = QWidget()
+    controls.setLayout(controls_layout)
+
+    def toggle_controls(value):
+        if value:
+            controls.show()
+        else:
+            controls.hide()
+    app.show_controls.listen(lambda o, n: toggle_controls(n))
 
     return controls
 
@@ -502,14 +514,44 @@ def main():
     root_layout.setContentsMargins(0, 0, 0, 0)
     root_layout.setSpacing(0)
     root_layout.addWidget(output)
-    root_layout.addLayout(controls)
+    root_layout.addWidget(controls)
 
     def onKeyPressed(event):
         key = event.key()
+        is_shift = event.modifiers() == Qt.ShiftModifier
         if key == Qt.Key_Backspace:
             clear_last(app)
+        elif key == Qt.Key_H and is_shift:
+            app.show_controls.set(not app.show_controls.value)
         elif 65 <= key <= 90:
             append(app, chr(key).lower())
+        elif key == Qt.Key_Greater:
+            append(app, '>')
+        elif key == Qt.Key_Less:
+            append(app, '<')
+        elif key == Qt.Key_Equal:
+            append(app, '=')
+        elif not app.show_controls.value:
+            if Qt.Key_0 <= key <= Qt.Key_9:
+                append(app, chr(key))
+            elif key == Qt.Key_C and is_shift:
+                clear(app)
+            elif key == Qt.Key_Return:
+                evaluate(app)
+            elif key == Qt.Key_Percent:
+                append(app, '%')
+            elif key == Qt.Key_Comma:
+                append(app, ",")
+            elif key == Qt.Key_Period:
+                append(app, ".")
+            elif key == Qt.Key_Plus:
+                append(app, "+")
+            elif key == Qt.Key_Minus:
+                append(app, "-")
+            elif key == Qt.Key_Asterisk:
+                append(app, "*")
+            elif key == Qt.Key_Slash:
+                append(app, "/")
 
     root = QWidget()
     root.setObjectName("root")

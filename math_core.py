@@ -5,6 +5,12 @@
 from math import *
 import math
 from random import random as rand
+import parser
+
+
+# Todo: Use sth different then eval(...) to evaluate expressions
+def evaluate(formula):
+    return eval(parser.expr(formula).compile())
 
 
 def sqrt(value, n):
