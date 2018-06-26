@@ -6,11 +6,14 @@
 Main entry point for 'Plain Old Calculator' (Poc) application
 
 Todo:
-* Complete adding MenuBar
+* Fix bug that view menu contains 'Show Tabs & Show All Tabs' after toggling
+  controls
 * Add persistent preference managing
 * Use a different approach to parse formulas (maybe SymPy)
 * Add tooltips to controls
 * Create a scrollable output widget which allows to display plots
+* Create a better application icon
+* Create scripts to build Mac Os, Windows and Linux Executables
 """
 
 
@@ -420,32 +423,21 @@ def setup_output(app):
     return output
 
 
-def setup_menu_bar(app):
+def setup_menu_bar(window, app):
+    menu_bar = window.menuBar()
+
     # Add View Menu
-    toggle_controls = QAction()
-    toggle_controls.setText("Hide Controls")
+    toggle_controls_act = QAction("&Hide Controls", window)
+    toggle_controls_act.setShortcut('Shift+h')
 
-    view_menu = QMenu()
-    view_menu.setTitle("&View")
-    view_menu.addAction(toggle_controls)
+    app.show_controls.listen(lambda o, n: toggle_controls_act.setText(
+        'Hide Controls' if n else 'Show Controls'))
 
-    # Create Library Menu
-    add_library = QAction()
-    add_library.setText("Add Library")
+    toggle_controls_act.triggered.connect(lambda state: app.show_controls.set(
+        not app.show_controls.value))
 
-    library_menu = QMenu()
-    library_menu.setTitle("&Library")
-    library_menu.addAction(add_library)
-
-    test_action = QAction()
-    test_action.setText('_Heeellooo')
-
-    menu_bar = QMenuBar()
-    menu_bar.addAction(test_action)
-    menu_bar.addMenu(view_menu)
-    menu_bar.addMenu(library_menu)
-
-    return menu_bar
+    view_menu = menu_bar.addMenu("&View")
+    view_menu.addAction(toggle_controls_act)
 
 
 def main():
@@ -534,8 +526,6 @@ def main():
 
         if key == Qt.Key_Backspace:
             clear_last(app)
-        elif key == Qt.Key_H and is_shift:
-            app.show_controls.set(not app.show_controls.value)
         elif 65 <= key <= 90 and not is_shift and not is_ctrl and not is_alt:
             append(app, chr(key).lower())
         elif key == Qt.Key_Greater:
@@ -580,12 +570,12 @@ def main():
     root.setWindowTitle(app.title.value)
     app.title.listen(lambda o, n: root.setWindowTitle(n))
 
-    menu_bar = setup_menu_bar(app)
-
     window = QMainWindow()
     window.setWindowTitle("Plain Old Calculator")
     window.setCentralWidget(root)
-    window.setMenuBar(menu_bar)
+
+    setup_menu_bar(window, app)
+
     window.show()
     window.setFixedSize(root.width(), root.height())
 
