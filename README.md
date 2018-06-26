@@ -17,14 +17,13 @@ install PyQt5
 
 and finally start the app
 > cd plain-old-calculator  
-> ./main.py
+> src/main.py
 
 
 ### Side Notes
 - The project was only tested under Mac Os but should also run under Linux and
 Windows.
-- The function is parsed by python directly so you can use any basic python
-function if you want but remember it has to fit in one line ;)
+- Functions are parsed directly via eval(...) so be aware of that
 - The mr and 2^nd button don't have any functionality yet maybe some is added
 in time
 - If you are using the i3 window manager (e.g. if you are using Arch) you might
