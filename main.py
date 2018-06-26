@@ -519,11 +519,14 @@ def main():
     def onKeyPressed(event):
         key = event.key()
         is_shift = event.modifiers() == Qt.ShiftModifier
+        is_ctrl = event.modifiers() == Qt.ControlModifier
+        is_alt = event.modifiers() == Qt.AltModifier
+
         if key == Qt.Key_Backspace:
             clear_last(app)
         elif key == Qt.Key_H and is_shift:
             app.show_controls.set(not app.show_controls.value)
-        elif 65 <= key <= 90:
+        elif 65 <= key <= 90 and not is_shift and not is_ctrl and not is_alt:
             append(app, chr(key).lower())
         elif key == Qt.Key_Greater:
             append(app, '>')
