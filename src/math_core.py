@@ -1,5 +1,10 @@
 """
 © 2018 Jakob Rieke
+
+Core Library for mathematical expression parsing in Poc
+
+Todo:
+* Use sth different then eval(...) to evaluate expressions (maybe SymPy)
 """
 
 from math import *
@@ -8,7 +13,6 @@ from random import random as rand
 import parser
 
 
-# Todo: Use sth different then eval(...) to evaluate expressions
 def evaluate(formula):
     return eval(parser.expr(formula).compile())
 

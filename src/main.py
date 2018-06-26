@@ -2,6 +2,15 @@
 
 """
 © 2018 Jakob Rieke
+
+Main entry point for 'Plain Old Calculator' (Poc) application
+
+Todo:
+* Complete adding MenuBar
+* Add persistent preference managing
+* Use a different approach to parse formulas (maybe SymPy)
+* Add tooltips to controls
+* Create a scrollable output widget which allows to display plots
 """
 
 
@@ -499,10 +508,10 @@ def main():
     """)
 
     app_icon = QIcon()
-    app_icon.addFile('resources/icon-16x.png', QSize(16, 16))
-    app_icon.addFile('resources/icon-64x.png', QSize(64, 64))
-    app_icon.addFile('resources/icon-128x.png', QSize(128, 128))
-    app_icon.addFile('resources/icon-256x.png', QSize(256, 256))
+    app_icon.addFile('../resources/icon-16x.png', QSize(16, 16))
+    app_icon.addFile('../resources/icon-64x.png', QSize(64, 64))
+    app_icon.addFile('../resources/icon-128x.png', QSize(128, 128))
+    app_icon.addFile('../resources/icon-256x.png', QSize(256, 256))
     qt_app.setWindowIcon(app_icon)
 
     app = App()
