@@ -6,12 +6,8 @@
 Main entry point for 'Plain Old Calculator' (Poc) application
 
 Todo:
-* Fix bug that view menu contains 'Show Tabs & Show All Tabs' after toggling
-  controls
 * Add persistent preference managing
-* Use a different approach to parse formulas (maybe SymPy)
 * Add tooltips to controls
-* Create a scrollable output widget which allows to display plots
 * Create a better application icon
 * Create scripts to build Mac Os, Windows and Linux Executables
 """
@@ -24,7 +20,7 @@ from observable import Observable, ObservableBool, ObservableString
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, \
-    QLayout, QVBoxLayout, QTextEdit, QAction, QMainWindow
+    QLayout, QVBoxLayout, QTextEdit, QMainWindow
 
 
 class App:
@@ -37,8 +33,6 @@ class App:
         self.history = []
         self.history_position = -1
         self.max_history_length = 100
-
-        self.show_controls = ObservableBool(True)
 
 
 def append(app, value):
@@ -351,9 +345,6 @@ def setup_controls(app):
     controls = QWidget()
     controls.setLayout(controls_layout)
 
-    app.show_controls.listen(
-        lambda o, n: controls.show() if n else controls.hide())
-
     return controls
 
 
@@ -417,23 +408,6 @@ def setup_output(app):
     output.setLayout(output_layout)
 
     return output
-
-
-def setup_menu_bar(window, app):
-    menu_bar = window.menuBar()
-
-    # Add View Menu
-    toggle_controls_act = QAction("&Hide Controls", window)
-    toggle_controls_act.setShortcut('Shift+h')
-
-    app.show_controls.listen(lambda o, n: toggle_controls_act.setText(
-        'Hide Controls' if n else 'Show Controls'))
-
-    toggle_controls_act.triggered.connect(
-        lambda state: app.show_controls.toggle())
-
-    view_menu = menu_bar.addMenu("&View")
-    view_menu.addAction(toggle_controls_act)
 
 
 def main():
@@ -513,7 +487,6 @@ def main():
     root_layout.addWidget(output)
     root_layout.addWidget(controls)
 
-    # Todo: Optimize onKeyPressed(event)
     def onKeyPressed(event):
         key = event.key()
         is_shift = event.modifiers() == Qt.ShiftModifier
@@ -530,34 +503,6 @@ def main():
             append(app, '<')
         elif key == Qt.Key_Equal:
             append(app, '=')
-        elif not app.show_controls.value:
-            if Qt.Key_0 <= key <= Qt.Key_9 and not is_shift and not is_ctrl \
-                    and not is_alt:
-                append(app, chr(key))
-            elif key == Qt.Key_C and is_shift:
-                clear(app)
-            elif key == Qt.Key_Return:
-                evaluate(app)
-            elif key == Qt.Key_Percent:
-                append(app, '%')
-            elif key == Qt.Key_Comma:
-                append(app, ",")
-            elif key == Qt.Key_Period:
-                append(app, ".")
-            elif key == Qt.Key_Plus:
-                append(app, "+")
-            elif key == Qt.Key_Minus:
-                append(app, "-")
-            elif key == Qt.Key_Asterisk:
-                append(app, "*")
-            elif key == Qt.Key_Slash:
-                append(app, "/")
-            elif key == Qt.Key_ParenLeft:
-                append(app, '(')
-            elif key == Qt.Key_ParenRight:
-                append(app, ')')
-            elif key == Qt.Key_BracketRight:
-                append(app, ']')
 
     root = QWidget()
     root.setObjectName("root")
@@ -569,8 +514,6 @@ def main():
     window = QMainWindow()
     window.setWindowTitle("Plain Old Calculator")
     window.setCentralWidget(root)
-
-    setup_menu_bar(window, app)
 
     window.show()
     window.setFixedSize(root.width(), root.height())
