@@ -516,6 +516,7 @@ def main():
     root_layout.addWidget(output)
     root_layout.addWidget(controls)
 
+    # Todo: Optimize onKeyPressed(event)
     def onKeyPressed(event):
         key = event.key()
         is_shift = event.modifiers() == Qt.ShiftModifier
@@ -535,7 +536,8 @@ def main():
         elif key == Qt.Key_Equal:
             append(app, '=')
         elif not app.show_controls.value:
-            if Qt.Key_0 <= key <= Qt.Key_9:
+            if Qt.Key_0 <= key <= Qt.Key_9 and not is_shift and not is_ctrl \
+                    and not is_alt:
                 append(app, chr(key))
             elif key == Qt.Key_C and is_shift:
                 clear(app)
@@ -555,6 +557,12 @@ def main():
                 append(app, "*")
             elif key == Qt.Key_Slash:
                 append(app, "/")
+            elif key == Qt.Key_ParenLeft:
+                append(app, '(')
+            elif key == Qt.Key_ParenRight:
+                append(app, ')')
+            elif key == Qt.Key_BracketRight:
+                append(app, ']')
 
     root = QWidget()
     root.setObjectName("root")
