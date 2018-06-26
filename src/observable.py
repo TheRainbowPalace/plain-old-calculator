@@ -18,3 +18,16 @@ class Observable(object):
 
     def listen(self, listener):
         self.listener.append(listener)
+
+
+class ObservableBool(Observable):
+    def toggle(self):
+        self.set(not self.value)
+
+
+class ObservableString(Observable):
+    pass
+
+
+class ObservableNumber(Observable):
+    pass

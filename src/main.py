@@ -20,11 +20,11 @@ Todo:
 import sys
 from time import time
 import math_core
-from observable import Observable
+from observable import Observable, ObservableBool, ObservableString
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QGridLayout, \
-    QLayout, QVBoxLayout, QTextEdit, QMenuBar, QMenu, QAction, QMainWindow
+    QLayout, QVBoxLayout, QTextEdit, QAction, QMainWindow
 
 
 class App:
@@ -32,13 +32,13 @@ class App:
         self.title = Observable("Calculator")
         self.window_position = (0, 0)
         self.empty_formula = '0'
-        self.formula = Observable(self.empty_formula)
-        self.result = Observable("")
+        self.formula = ObservableString(self.empty_formula)
+        self.result = ObservableString("")
         self.history = []
         self.history_position = -1
         self.max_history_length = 100
 
-        self.show_controls = Observable(True)
+        self.show_controls = ObservableBool(True)
 
 
 def append(app, value):
@@ -351,12 +351,8 @@ def setup_controls(app):
     controls = QWidget()
     controls.setLayout(controls_layout)
 
-    def toggle_controls(value):
-        if value:
-            controls.show()
-        else:
-            controls.hide()
-    app.show_controls.listen(lambda o, n: toggle_controls(n))
+    app.show_controls.listen(
+        lambda o, n: controls.show() if n else controls.hide())
 
     return controls
 
@@ -433,8 +429,8 @@ def setup_menu_bar(window, app):
     app.show_controls.listen(lambda o, n: toggle_controls_act.setText(
         'Hide Controls' if n else 'Show Controls'))
 
-    toggle_controls_act.triggered.connect(lambda state: app.show_controls.set(
-        not app.show_controls.value))
+    toggle_controls_act.triggered.connect(
+        lambda state: app.show_controls.toggle())
 
     view_menu = menu_bar.addMenu("&View")
     view_menu.addAction(toggle_controls_act)
